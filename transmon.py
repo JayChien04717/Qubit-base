@@ -6,10 +6,10 @@ ref paper: A Quantum Engineer’s Guide to Superconducting Qubits, Charge insens
 
 import numpy as np
 import qutip as qt
+import op_funtion as op
 
-
-class Transmon:
-    def __init__(self, EJ, EC, ng, ncut, N) -> None:
+class Transmon():
+    def __init__(self, EJ, EC, ng, N) -> None:
         '''
 
         Parameter
@@ -28,17 +28,16 @@ class Transmon:
         self.EJ = EJ
         self.EC = EC
         self.ng = ng
-        self.ncut = ncut
+
         self.N = N
+        self.op = op.Operator(N)
+
 
     def hamiltonium(self):
-        pass
+        H = 4*self.EC*(self.op.n_op() - self.ng*qt.qeye(2*self.N+1))**2 - self.EJ*self.op.cos_phi_op()
+        return H
 
-
-
-
-
-
+    
 class TunableTransmon:
     def __init__(self, EJ, EC, ng, ncut, d, N) -> None:
         '''
@@ -70,6 +69,7 @@ class TunableTransmon:
         pass
 
 if __name__=="__main__":
-    from op_funtion import Operator as op
-    a = op(3)
-    print(op.n_op(3))
+    import matplotlib.pyplot as plt
+    import numpy as np
+    from qutip import Qobj, about, energy_level_diagram, ket2dm, mesolve
+    print(qt.sigmam())

@@ -3,11 +3,12 @@ import numpy as np
 class Operator:
     def __init__(self, N) -> None:
         self.N = N
-        pass
+        
     def n_op(self):
         dim = np.arange(-self.N, self.N+1,1)
         chagre_basis = np.diag(dim)
         return chagre_basis
+    
     def exp_i_phi_op(self):
         """
         exp(i\phi)|N> = |N+1><N|
@@ -35,5 +36,15 @@ class Operator:
         sin_op = -1j * 0.5 * self.exp_i_phi_op()
         sin_op += sin_op.conjugate().T
         return sin_op
+
+
+
+
+
 if __name__ == "__main__":
     pass
+    a = Operator(2)
+    a = 4*(a.n_op()-0.3)**2
+    print(a)
+    # print(a.n_op()**2)
+    # print(a.cos_phi_op())
