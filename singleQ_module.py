@@ -3,6 +3,7 @@ from numpy import pi, sqrt
 import matplotlib.pyplot as plt
 from pulsemodule import *
 from qutip import *
+    
 
 """
 chalmers xmon parameter|flux pump    
@@ -14,7 +15,7 @@ dephasing = 0.024MHz   |0.1MHz
 """
 def cops_term():
     g1 = 1.15    # relaxation rate
-    g2 = 0.001       # dephasing rate
+    g2 = 0.024       # dephasing rate
     n_th = 10e-3       # bath temperature
     c_ops = []
     c_ops.append(sqrt(g1 * (1+n_th)) * sigmam())
@@ -33,7 +34,7 @@ def const(x: np.array, lv: float):
     return lv * np.ones(x.size)
 
 def population():
-    return sigmap()*sigmam()
+    return sigmam()*sigmap()
 
 def h_q(f):
     return 0.5*f*sigmaz()
@@ -46,18 +47,18 @@ def q_flux(flux_envelope):
 def q_drive(phase, pulse):
     return [0.5*(np.cos(phase)*sigmax()+np.sin(phase)*sigmay()), pulse]
 
-t1 = np.arange(0,15,0.05)
-t2 = np.arange(15,17, 0.05)
+t1 = np.arange(0,13,0.05)
+t2 = np.arange(13,17, 0.05)
 delta = np.linspace(-30,30,301)
 
 tlist = np.concatenate((t1,t2))
-flux= 20*np.sin(tlist*2*np.pi)
-pulse = np.concatenate((const(t1,3), const(t2,0)))
+flux= 0*np.sin(tlist*2*np.pi*2)
+pulse = np.concatenate((const(t1,4), const(t2,0)))
 phase1 = 0
 phase2 = 0.5*np.pi
 
 
-psi0 = basis(2, 1)
+psi0 = basis(2, 0)
 
 def plot_2D(tlist, detune):
     z = np.vstack([np.zeros(len(tlist))]*len(delta))
@@ -69,6 +70,7 @@ def plot_2D(tlist, detune):
     ax.imshow(z,aspect = "auto")
     plt.show()
 plot_2D(tlist, delta)
+# print(sigmaz())
 
 # z = np.vstack([np.zeros(len(tlist))]*len(delta))
 # for i,j in enumerate(delta):

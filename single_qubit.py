@@ -31,7 +31,8 @@ phase = 0
 delta = np.linspace(-30,30,301) #detuning
 
 # on resonsance qubit H
-#H = QobjEvo([0.5*sigmaz(),[0.5*(np.cos(phase)*sigmax()+np.sin(phase)*sigmay()), pulse]])
+# H = QobjEvo([0.5*sigmaz(),[0.5*(np.cos(phase)*sigmax()+np.sin(phase)*sigmay()), pulse]], tlist=tlist)
+
 
 psi0 = basis(2, 1) # inistial ground state
 population = sigmap()*sigmam()
@@ -41,6 +42,7 @@ for i,j in enumerate(delta):
     result = mesolve(H, psi0, tlist, c_ops, [])
     z[i,:] = expect(population, result.states)
 fig, ax = plt.subplots()
-ax.imshow(z,aspect = "auto")
+# ax.imshow(z,aspect = "auto" )
+ax.matshow(z)
 plt.show()
 

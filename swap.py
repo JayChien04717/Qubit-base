@@ -3,9 +3,9 @@ import numpy as np
 from numpy import pi, sqrt
 from qutip import *
 g = 1.0 * 2 * pi # coupling strength
-g1 = 0.75        # relaxation rate
+g1 = 1.15        # relaxation rate
 g2 = 0.25        # dephasing rate
-n_th = 1.5       # bath temperature
+n_th = 0       # bath temperature
 
 T = pi/(4*g)
 H = g * (tensor(sigmax(), sigmax()) + tensor(sigmay(), sigmay()))
@@ -32,8 +32,8 @@ op_label = [["i", "x", "y", "z"]] * 2
 t = np.linspace(0,1.5,101)
 result = mesolve(H, psi0, t, c_ops,[])
 a=destroy(2)
-photon_a=tensor(a.dag()*a, qeye(2))
-photon_b=tensor(qeye(2), a.dag()*a)
+photon_a=tensor(sigmap()*sigmam(), qeye(2))
+photon_b=tensor(qeye(2), sigmap()*sigmam())
 
 a = expect(tensor(sigmaz(), qeye(2)), result.states)
 b = expect(tensor(qeye(2), sigmaz()), result.states)
