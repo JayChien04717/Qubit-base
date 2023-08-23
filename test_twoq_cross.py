@@ -1,5 +1,5 @@
 from qutip import *
-from transmon import *
+from qubit import *
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -7,8 +7,8 @@ EJ = 13
 EC = 0.24
 N = 10
 flux = np.linspace(-0.5, 0.5,101)
-tmon = TunableTransmon(EJ, EC, 0, 0, 0, N)
-tmon2 = TunableTransmon(12, EC, 0, 0, 0, N)
+tmon = TunableTransmon(EJ, EC, 0, N,0)
+tmon2 = TunableTransmon(12, EC, 0, N, 0)
 
 z = np.zeros(len(flux))
 x = np.zeros(len(flux))
