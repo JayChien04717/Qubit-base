@@ -102,24 +102,41 @@ class Fluxnium:
     def hamiltonium(self, flux=0.5):
         diag_elements = [(i + 0.5) * self.plasma_energy() for i in range(self.dim)]
         lc_osc_matrix = np.diag(diag_elements)
-        cos_matrix = self.op.cos_phi_operator(beta=2 * np.pi * flux, phi_osc=self.phi_osc())
+        
+        cos_matrix = self.op.cos_phi_operator(beta=2 * np.pi * flux, phi_osc = self.phi_osc())
         H = lc_osc_matrix - self.EJ * cos_matrix
+        return H
+    
+    def bare_hamiltonian(self, phi_ext=0.5):
+        a = tensor(destroy(self.dim))
+        phi = (a+a.dag())*(8.0*self.EC/self.EL)**(0.25)/np.sqrt(2.0)
+        na = 1.0j*(a.dag()-a)*(self.EL/(8*self.EC))**(0.25)/np.sqrt(2.0)
+        ope = 1.0j*(phi - phi_ext)
+        H = 4.0*self.EC*na**2 + 0.5*self.EL*phi**2 - 0.5*self.EJ*(ope.expm() + (-ope).expm())
         return H
 
 if __name__=="__main__":
-    # EJ = 9.74
-    # EC = 0.99
-    # EL = 0.86
-    # f = Fluxnium(EJ, EC, EL, 110)
+    import matplotlib.pyplot as plt
+    EJ = 9.74
+    EC = 0.99
+    EL = 0.86
+    f = Fluxnium(EJ, EC, EL, 110)
+    h = f.bare_hamiltonian(0.2)
+    h = Qobj(h)
+    energy = h.eigenenergies()
+    print(energy[1]-energy[0])
+    flux = np.linspace(0,0.5, 2)
 
-    # H = Qobj(f.hamiltonium())
-    # energy = H.eigenenergies()
-    # print(energy[1]-energy[0])
+    # for i in flux:
+    #     print(i)
+        # h = f.bare_hamiltonian(i)
+        # h = Qobj(h)
+        # energy = h.eigenenergies()
+        # print(energy[1]-energy[0])
+        # plt.plot(energy[1]-energy[0])
+        
+    plt.show()
+ 
+    
 
-    def test():
-        return np.random.rand(3,3)
-  
-    a = np.vectorize(test)
-    a()
-    print(np.cos(a))
     pass
