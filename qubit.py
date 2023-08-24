@@ -78,7 +78,7 @@ class Fluxnium:
         self.EC = EC 
         self.EJ = EJ
         self.dim = dimention
-        self.op = op.Operator2(dimention)
+        self.op = op.Operator2(dimention, self.phi_osc())
     
     def phi_osc(self) -> float:
         """
@@ -97,46 +97,22 @@ class Fluxnium:
             Returns the plasma oscillation frequency, sqrt(8*EL*EC).
         """
         
-        return np.sqrt(8*self.EJ*self.EC) # LC plasma oscillation energy
+        return np.sqrt(8*self.EL*self.EC) # LC plasma oscillation energy
 
     def hamiltonium(self, flux=0.5):
         diag_elements = [(i + 0.5) * self.plasma_energy() for i in range(self.dim)]
         lc_osc_matrix = np.diag(diag_elements)
         
-        cos_matrix = self.op.cos_phi_operator(beta=2 * np.pi * flux, phi_osc = self.phi_osc())
+        cos_matrix = self.op.cos_phi_operator(flux=2*np.pi*flux)
         H = lc_osc_matrix - self.EJ * cos_matrix
         return H
     
-    def bare_hamiltonian(self, phi_ext=0.5):
-        a = tensor(destroy(self.dim))
-        phi = (a+a.dag())*(8.0*self.EC/self.EL)**(0.25)/np.sqrt(2.0)
-        na = 1.0j*(a.dag()-a)*(self.EL/(8*self.EC))**(0.25)/np.sqrt(2.0)
-        ope = 1.0j*(phi - phi_ext)
-        H = 4.0*self.EC*na**2 + 0.5*self.EL*phi**2 - 0.5*self.EJ*(ope.expm() + (-ope).expm())
-        return H
-
-if __name__=="__main__":
-    import matplotlib.pyplot as plt
-    EJ = 9.74
-    EC = 0.99
-    EL = 0.86
-    f = Fluxnium(EJ, EC, EL, 110)
-    h = f.bare_hamiltonian(0.2)
-    h = Qobj(h)
-    energy = h.eigenenergies()
-    print(energy[1]-energy[0])
-    flux = np.linspace(0,0.5, 2)
-
-    # for i in flux:
-    #     print(i)
-        # h = f.bare_hamiltonian(i)
-        # h = Qobj(h)
-        # energy = h.eigenenergies()
-        # print(energy[1]-energy[0])
-        # plt.plot(energy[1]-energy[0])
-        
-    plt.show()
- 
+    def hamiltonium2(self, flux=0):
+        charge = 4*self.EC*np.dot(self.op.n_operator(), self.op.n_operator())
+        inductance = 0.5*self.EL*(np.dot(self.op.phi_operator(), self.op.phi_operator()))
+        jj = self.EJ*self.op.cos_phi_operator(flux= 2*np.pi*flux )
+        return charge+inductance-jj
     
+if __name__=="__main__":
 
     pass
