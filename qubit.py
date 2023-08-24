@@ -98,6 +98,7 @@ class TunableTransmon2:
         self.ncut = ncut
         self.d = d
         self.op = op.Operator2(ncut, self.phi_osc())
+
     def phi_osc(self) -> float:
         """
         Returns
@@ -105,7 +106,6 @@ class TunableTransmon2:
             Returns oscillator length for the LC oscillator composed of the fluxonium
              inductance and capacitance.
         """
-
         return (8* self.EC / self.EJ) ** 0.25  # LC oscillator length
     
     def hamiltonium2(self, flux=0):
@@ -156,28 +156,5 @@ class Fluxnium:
         return charge+inductance-jj
     
 if __name__=="__main__":
-    import matplotlib.pyplot as plt
-    EJ = 13
-    EC = 0.29
-    a = TunableTransmon(EJ, EC, 0, 100, 0)
-    b = TunableTransmon2(EJ, EC,0, 100, 0)
-    h1 = Qobj(a.hamiltonium())
-    h2 = Qobj(b.hamiltonium2())
-    energy = h2.eigenenergies()
-    print(energy[1]-energy[0])
-    flux = np.linspace(0,1,101)
-    z = np.vstack([np.zeros(201)]*len(flux))
-    z2 = np.vstack([np.zeros(100)]*len(flux))
-    print(z[1,:].shape)
-    for i, j in enumerate(flux):
-        h1 = Qobj(a.hamiltonium(j))
-        h2 = Qobj(b.hamiltonium2(j))
-        
-        z[i,:] = h1.eigenenergies()
-        z2[i,:] = h2.eigenenergies()
-    # plt.plot(z2[1,:]-z2[0,:])
-    # # fig, ax = plt.subplots(1,2)
-    # # ax[0] = plt.plot(z[1,:]-z[0,:])
-    # # ax[1] = plt.plot(z2[1,:]-z2[0,:])
-    # plt.show()
+
     pass
