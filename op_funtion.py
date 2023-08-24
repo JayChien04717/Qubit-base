@@ -46,9 +46,9 @@ class Operator:
         return sin_op
     
 class Operator2:
-    def __init__(self, dimention) -> None:
+    def __init__(self, dimention, phi0) -> None:
         self.dim = dimention
-
+        self.phi0 = phi0
     def annihilation(self):
         offdiag_elements = np.sqrt(range(1, self.dim))
         return np.diagflat(offdiag_elements, 1)
@@ -58,15 +58,15 @@ class Operator2:
         np.diagflat(offdiag_elements, 1).T
         return  self.annihilation().T #np.diagflat(offdiag_elements, 1).T
 
-    def phi_operator(self,phi_osc):
-        return self.creation() + self.annihilation()* phi_osc/np.sqrt(2)
+    def phi_operator(self):
+        return (self.creation() + self.annihilation())* self.phi0/np.sqrt(2)
     
-    def n_operator(self, phi_osc):
-        return 1j*(self.creation() - self.annihilation())/ (phi_osc * np.sqrt(2))
+    def n_operator(self):
+        return 1j*(self.creation() - self.annihilation())/ (self.phi0 * np.sqrt(2))
         
 
-    def cos_phi_operator(self, beta=0, phi_osc=0):
-        argument = self.phi_operator(phi_osc) + beta * np.eye(self.dim)
+    def cos_phi_operator(self, flux=0):
+        argument = self.phi_operator()+flux*np.eye(self.dim)
         native = sp.linalg.cosm(argument)
         return native
 
@@ -86,24 +86,11 @@ class Qtoperator:
     def n_operator(self, phi_osc):
         return 1j*(self.creation() - self.annihilation())/ (phi_osc * np.sqrt(2))
     
-    def cos_phi_operator(self, flux=0, phi_osc=0.5):
-        argument = self.phi_operator(phi_osc) - flux*qeye(self.dim)
+    def cos_phi_operator(self, flux=0):
+        argument = self.phi_operator() - flux*qeye(self.dim)
         native = sp.linalg.cosm(argument)
         return native
 
 if __name__ == "__main__":
-    from qutip import *
-    op = Qtoperator(1)
-    EJ = 9.74
-    EC = 0.99
-    EL = 0.86
-    phi_osc = (8*EC/EL) ** 0.25
 
-    # H = 4*EC*op.n_operator(phi_osc)**2 + 0.5*EL*op.phi_operator(phi_osc)**2-EJ*op.cos_phi_operator(phi_osc=phi_osc)
-    # H = Qobj(H)
-    # energy = H.eigenenergies()
-    # print(np.abs(energy[1]-energy[0]))
-
-    print(op.cos_phi_operator(flux = 0,phi_osc=phi_osc))
-    print(op.cos_phi_operator(flux = 0.5,phi_osc=phi_osc))
-    pass
+    pass                
