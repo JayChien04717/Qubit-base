@@ -71,7 +71,49 @@ class TunableTransmon:
             np.sqrt(np.cos(np.pi*flux)**2+self.d**2*np.sin(np.pi*flux)**2)
         H = diagonal-off_diagonal
         return H
+    
+    
+class TunableTransmon2:
+    def __init__(self, EJ, EC, ng, ncut, d) -> None:
+        '''
 
+        Parameter
+        ----------
+        EJ:
+            josephson junction energy
+        EC:
+            capacitor energy
+        ng:
+            offset charge
+        ncut:
+            charge basis cutoff, `n = -ncut, ..., ncut`
+        d:
+            asymmetry between two josephton junction,
+        eng_lev:
+            energy level want to calculate |N>
+        '''
+        self.EJ = EJ
+        self.EC = EC
+        self.ng = ng
+        self.ncut = ncut
+        self.d = d
+        self.op = op.Operator2(ncut, self.phi_osc())
+    def phi_osc(self) -> float:
+        """
+        Returns
+        -------
+            Returns oscillator length for the LC oscillator composed of the fluxonium
+             inductance and capacitance.
+        """
+
+        return (8* self.EC / self.EJ) ** 0.25  # LC oscillator length
+    
+    def hamiltonium2(self, flux=0):
+        charge = 4*self.EC*np.dot(self.op.n_operator(), self.op.n_operator())
+        JJ = self.EJ*self.op.cos_phi_operator()*\
+            np.sqrt(np.cos(np.pi*flux)**2+self.d**2*np.sin(np.pi*flux)**2)
+        return charge-JJ
+    
 class Fluxnium:
     def __init__(self, EJ, EC, EL, dimention) -> None:
         self.EL = EL 
@@ -114,5 +156,28 @@ class Fluxnium:
         return charge+inductance-jj
     
 if __name__=="__main__":
-
+    import matplotlib.pyplot as plt
+    EJ = 13
+    EC = 0.29
+    a = TunableTransmon(EJ, EC, 0, 100, 0)
+    b = TunableTransmon2(EJ, EC,0, 100, 0)
+    h1 = Qobj(a.hamiltonium())
+    h2 = Qobj(b.hamiltonium2())
+    energy = h2.eigenenergies()
+    print(energy[1]-energy[0])
+    flux = np.linspace(0,1,101)
+    z = np.vstack([np.zeros(201)]*len(flux))
+    z2 = np.vstack([np.zeros(100)]*len(flux))
+    print(z[1,:].shape)
+    for i, j in enumerate(flux):
+        h1 = Qobj(a.hamiltonium(j))
+        h2 = Qobj(b.hamiltonium2(j))
+        
+        z[i,:] = h1.eigenenergies()
+        z2[i,:] = h2.eigenenergies()
+    # plt.plot(z2[1,:]-z2[0,:])
+    # # fig, ax = plt.subplots(1,2)
+    # # ax[0] = plt.plot(z[1,:]-z[0,:])
+    # # ax[1] = plt.plot(z2[1,:]-z2[0,:])
+    # plt.show()
     pass
