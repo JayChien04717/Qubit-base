@@ -2,6 +2,7 @@ import numpy as np
 import scipy as sp
 from numpy import ndarray
 from qutip import *
+
 class Operator:
     def __init__(self, ncut) -> None:
         self.ncut = ncut
@@ -71,25 +72,25 @@ class Operator2:
         return native
 
 class Qtoperator:
-    def __init__(self, dimention) -> None:
-        self.dim = dimention
+    def __init__(self, dimention, phi0) -> None:
+        self.dim = dimention    
+        self.phi0 = phi0
 
     def annihilation(self):
         return destroy(self.dim)
     
     def creation(self):
-        return  self.annihilation().dag()
+        return self.annihilation.dag()
+
+    def phi_operator(self):
+        return self.creation() + self.annihilation()* self.phi0/np.sqrt(2)
     
-    def phi_operator(self,phi_osc):
-        return self.creation() + self.annihilation()* phi_osc/np.sqrt(2)
-    
-    def n_operator(self, phi_osc):
-        return 1j*(self.creation() - self.annihilation())/ (phi_osc * np.sqrt(2))
+    def n_operator(self):
+        return 1j*(self.creation() - self.annihilation())/ (self.phi0 * np.sqrt(2))
     
     def cos_phi_operator(self, flux=0):
         argument = self.phi_operator() - flux*qeye(self.dim)
-        native = sp.linalg.cosm(argument)
-        return native
+        return argument.cosm()
 
 if __name__ == "__main__":
 
