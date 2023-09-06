@@ -3,7 +3,7 @@ from numpy import pi, sqrt
 import matplotlib.pyplot as plt
 from pulsemodule import *
 from qutip import *
-
+import matplotlib.colors as mcolors
 """
 chalmers xmon parameter|flux pump    
 f01 = 4.772            |5
@@ -23,12 +23,16 @@ c_ops.append(sqrt(g2) * sigmaz()) # Pure dephasing
 
 def const(x: np.array, lv: float):
     return lv * np.ones(x.size)
+
+
+
 t1 = np.arange(0,15,0.05)
 t2 = np.arange(15,17, 0.05)
 tlist = np.concatenate((t1,t2))
 pulse = np.concatenate((const(t1,3), const(t2,0)))# driving pulse
 phase = 0
-delta = np.linspace(-30,30,301) #detuning
+
+delta = np.linspace(-30,30,101) #detuning
 
 # on resonsance qubit H
 # H = QobjEvo([0.5*sigmaz(),[0.5*(np.cos(phase)*sigmax()+np.sin(phase)*sigmay()), pulse]], tlist=tlist)
@@ -41,8 +45,9 @@ for i,j in enumerate(delta):
     H = QobjEvo([0.5*j*sigmaz(),[0.5*(np.cos(phase)*sigmax()+np.sin(phase)*sigmay()), pulse]], tlist=tlist)
     result = mesolve(H, psi0, tlist, c_ops, [])
     z[i,:] = expect(population, result.states)
+
 fig, ax = plt.subplots()
-# ax.imshow(z,aspect = "auto" )
-ax.matshow(z)
+c = ax.imshow(z, aspect = "auto", extent = [ pulse.min(), pulse.max(),delta.min(), delta.max()])
+fig.colorbar(c, ax=ax)
 plt.show()
 
