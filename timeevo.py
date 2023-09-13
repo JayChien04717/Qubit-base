@@ -47,7 +47,7 @@ population = sigmap()*sigmam()
 
 z = np.vstack([np.zeros(len(t))]*len(delta))
 for i,j in enumerate(delta):
-    print(j)
+
     H = 0.5*tensor(sigmaz()*j, qeye(2))+h2+couple
     result = mesolve(couple, psi0, t, c_ops,[])
     z[i,:] = expect(tensor(population, qeye(2)), result.states)
