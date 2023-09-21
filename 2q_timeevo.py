@@ -39,18 +39,9 @@ psi0 = tensor(basis(2,1), basis(2,0))
 result = mesolve(couple, psi0, t, c_ops,[])
 
 population = sigmap()*sigmam() 
-# a = expect(tensor(population, qeye(2)), result.states)
-# b = expect(tensor(qeye(2), population), result.states)
-# plt.plot(a)
-# plt.plot(b)
-# plt.show()
-
-z = np.vstack([np.zeros(len(t))]*len(delta))
-for i,j in enumerate(delta):
-
-    H = 0.5*tensor(sigmaz()*j, qeye(2))+h2+couple
-    result = mesolve(couple, psi0, t, c_ops,[])
-    z[i,:] = expect(tensor(population, qeye(2)), result.states)
-
-plt.imshow(z)
+a = expect(tensor(population, qeye(2)), result.states)
+b = expect(tensor(qeye(2), population), result.states)
+plt.plot(a)
+plt.plot(b)
 plt.show()
+
