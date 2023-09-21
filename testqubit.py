@@ -54,8 +54,9 @@ def test_Fluxonium():
     
 test_Fluxonium()
 plt.show()
-import scqubits as scq
 
+# Compare with scqubits
+import scqubits as scq
 fluxonium = scq.Fluxonium(
     EJ = 10,
     EC = 1,
