@@ -30,18 +30,18 @@ def const(x: np.array, lv: float):
 
 h1 = 0.5*tensor(sigmaz(), qeye(2))
 h2 = 0.5*tensor(qeye(2), sigmaz())
+print(h1)
 couple = g*(tensor(sigmap(), sigmam())+tensor(sigmam(), sigmap()))
 H = h1+h2+couple
 
 t = np.linspace(0,5, 101)
-delta = np.linspace(-30,30,301) #detuning
 psi0 = tensor(basis(2,1), basis(2,0))
 result = mesolve(couple, psi0, t, c_ops,[])
 
 population = sigmap()*sigmam() 
 a = expect(tensor(population, qeye(2)), result.states)
 b = expect(tensor(qeye(2), population), result.states)
-plt.plot(a)
-plt.plot(b)
-plt.show()
+# plt.plot(a)
+# plt.plot(b)
+# plt.show()
 
