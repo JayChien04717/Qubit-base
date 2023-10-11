@@ -25,12 +25,12 @@ c_ops.append(sqrt(g1 * (1+n_th)) * sm2)
 c_ops.append(sqrt(g1 * n_th) * sm2.dag())
 c_ops.append(sqrt(g2) * sz2)
 
+print(c_ops)
 def const(x: np.array, lv: float):
     return lv * np.ones(x.size)
 
 h1 = 0.5*tensor(sigmaz(), qeye(2))
 h2 = 0.5*tensor(qeye(2), sigmaz())
-print(h1)
 couple = g*(tensor(sigmap(), sigmam())+tensor(sigmam(), sigmap()))
 H = h1+h2+couple
 
