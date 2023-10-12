@@ -65,20 +65,20 @@ class QubitSimulator:
 #             psi0 += [basis(2,1)]
 #     return tensor(psi0)
 
-number_of_qubit = 3
+number_of_qubit = 14
 sim = QubitSimulator(number_of_qubit)
 H = sim.couple()+sim.multi_qubit_hamiltonian()
 c_ops = sim.multipleQ_cops()
 g = 500        
 time_period = 1/g
-t = np.linspace(0,10*time_period, 31)
+t = np.linspace(0,10*time_period, 1)
 base = [basis(2,0)]+[basis(2,1)]*(number_of_qubit-1)
 psi0 = tensor(base)
 result = mesolve(H, psi0, t, c_ops,[])
 
 
 population = sigmap()*sigmam()
-a = expect(tensor([population]+[qeye(2)]*2), result.states)
+a = expect(tensor([population]+[qeye(2)]*(number_of_qubit-1)), result.states)
 # b = expect(tensor([qeye(2)]+[population]+[qeye(2)]*3), result.states)
 # c = expect(tensor([qeye(2)]*2+[population]+[qeye(2)]*2), result.states)
 # d = expect(tensor([qeye(2)]*3+[population]+[qeye(2)]), result.states
