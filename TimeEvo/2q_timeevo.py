@@ -42,6 +42,6 @@ population = sigmap()*sigmam()
 a = expect(tensor(population, qeye(2)), result.states)
 b = expect(tensor(qeye(2), population), result.states)
 # plt.plot(a)
-# plt.plot(b)
-# plt.show()
+plt.plot(b)
+plt.show()
 
