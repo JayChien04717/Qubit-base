@@ -1,10 +1,15 @@
 import numpy as np
+from numpy import ndarray
 from qutip import *
 from numpy import pi, sqrt
 import matplotlib.pyplot as plt
 
 class QubitSimulator:
-    def __init__(self, number_of_qubit, couple_strength, relax=1.15, dephasing=0.024):
+    def __init__(self, number_of_qubit, couple_strength, relax=0.1, dephasing=0.1):
+        '''
+        In MHz unit
+        '''
+        self.freq = 4e9
         self.n_qubit = number_of_qubit
         self.g = couple_strength
         self.relax = relax
@@ -13,6 +18,13 @@ class QubitSimulator:
         """ Function to create the multiple qubit collapse matrix.
         For 3 qubit, there has 3 list and each list conatin (2**3)x(2**3)
         matrix
+
+        Returns
+        -------
+        sigmam_list: list
+            The list with the sigma_minus operators in the 2^N Hilbert space. Each element in the list is 2^N*2^N dimentions
+        sigmaz_list: list
+            The list with the sigma_z operators in the 2^N Hilbert space. Each element in the list is 2^N*2^N dimentions
         """
         sigmam_list = [[0]]*self.n_qubit
         sigmaz_list = [[0]]*self.n_qubit
@@ -23,7 +35,13 @@ class QubitSimulator:
         return sigmam_list, sigmaz_list
 
     def multipleQ_cops(self):
-        #in MHz
+        ''' Function to give collapse operators
+
+        Returns
+        -------
+        c_ops_list: list
+            The list with the collapse operators in the 2^N Hilbert space.
+        '''
         sigmam_list, sigmaz_list = self.multipleQ_matrix_list()
         n_th = 10e-3    # bath temperature
         c_ops=[]
@@ -34,7 +52,6 @@ class QubitSimulator:
         return c_ops
 
     def couple(self):
-        g = 1 * 2 * pi
         couple_list = [0]*(self.n_qubit-1)
         for i in range(self.n_qubit-1):
             couple_list[i] = self.g*(
@@ -47,7 +64,7 @@ class QubitSimulator:
         hamiltonian_list = [[0]]*self.n_qubit
         for i in range(self.n_qubit):
             hamiltonian_list[i] = tensor(
-                [qeye(2)]*i + [0.5*sigmaz()]+[qeye(2)]*(self.n_qubit-1-i)
+                [qeye(2)]*i + [0.5*self.freq*sigmaz()]+[qeye(2)]*(self.n_qubit-1-i)
             )
         return sum(hamiltonian_list)
     
@@ -76,33 +93,27 @@ class QubitSimulator:
                 [qeye(2)]*i + [sigmax()]+[qeye(2)]*(self.n_qubit-1-i))
         return population, sz, sx, sy
 
+    def plot(self, result, n_quit_plot:list, time:ndarray):
+        pop, sz, sx, sy = self.measure_state()
+        for i in n_quit_plot:
+            plt.plot(time, expect(pop[i], result.states), label=f'q{i}')
+        plt.xlabel("us")
+        plt.legend()
+        plt.show()
+            
 
 
-number_of_qubit = 2
-g = 5
-sim = QubitSimulator(number_of_qubit, g)
-H = sim.couple()+sim.multi_qubit_hamiltonian()
-c_ops = sim.multipleQ_cops()    
-time_period = 1/g
-t = np.linspace(0,10*time_period, 101)
-base = [basis(2,0)]+[basis(2,1)]*(number_of_qubit-1)
-psi0 = tensor(base)
-psi=sim.initial_state(0)
-pop, sz, sx, sy = sim.measure_state()
-result = mesolve(H, psi, t, c_ops,[])
-print(sy)
-population = sigmap()*sigmam()
-# a = expect(tensor([population]+[qeye(2)]*(number_of_qubit-1)), result.states)
-a = expect(sz[0], result.states)
-# b = expect(tensor([qeye(2)]+[population]+[qeye(2)]*3), result.states)
-# c = expect(tensor([qeye(2)]*2+[population]+[qeye(2)]*2), result.states)
-# d = expect(tensor([qeye(2)]*3+[population]+[qeye(2)]), result.states
-# e = expect(tensor([qeye(2)]*4+[population]), result.states)
-plt.plot(a, label = "q1")
-# plt.plot(b, label = "q2")
-# plt.plot(c, label = "q3")
-# plt.plot(d, label = "q4")
-# plt.plot(e, label = "q5")
-# plt.xlabel("ns")
-# plt.legend()
-plt.show()
+if __name__=='__main__':
+    number_of_qubit = 2
+    g = 1
+    sim = QubitSimulator(number_of_qubit, g)
+    H = sim.couple()+sim.multi_qubit_hamiltonian()
+    c_ops = sim.multipleQ_cops()
+
+    time_period = 1/g
+    t = np.linspace(0,100*time_period, 1001)
+    psi=sim.initial_state(0)
+    pop, sz, sx, sy = sim.measure_state()
+    result = mesolve(H, psi, t, c_ops,[])
+    sim.plot(result, [0,1], t)
+
