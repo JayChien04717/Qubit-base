@@ -4,9 +4,11 @@ from numpy import pi, sqrt
 import matplotlib.pyplot as plt
 
 class QubitSimulator:
-    def __init__(self, number_of_qubit, couple_strength):
+    def __init__(self, number_of_qubit, couple_strength, relax=1.15, dephasing=0.024):
         self.n_qubit = number_of_qubit
         self.g = couple_strength
+        self.relax = relax
+        self.dephas= dephasing
     def multipleQ_matrix_list(self):
         """ Function to create the multiple qubit collapse matrix.
         For 3 qubit, there has 3 list and each list conatin (2**3)x(2**3)
@@ -23,16 +25,13 @@ class QubitSimulator:
     def multipleQ_cops(self):
         #in MHz
         sigmam_list, sigmaz_list = self.multipleQ_matrix_list()
-        g1 = 1.15    # relaxation rate
-        g2 = 0.024       # dephasing rate
         n_th = 10e-3    # bath temperature
         c_ops=[]
         for i in range(self.n_qubit):
-            c_ops.append(sqrt(g1 * (1+n_th)) *sigmam_list[i])
-            c_ops.append(sqrt(g1 * n_th) * sigmam_list[i].dag())
-            c_ops.append(sqrt(g2) * sigmaz_list[i])
+            c_ops.append(sqrt(self.relax * (1+n_th)) *sigmam_list[i])
+            c_ops.append(sqrt(self.relax * n_th) * sigmam_list[i].dag())
+            c_ops.append(sqrt(self.dephas) * sigmaz_list[i])
         return c_ops
-
 
     def couple(self):
         g = 1 * 2 * pi
@@ -63,11 +62,24 @@ class QubitSimulator:
 
     def measure_state(self):
         population = [0]*self.n_qubit
-        sz = 0
+        sz = [0]*self.n_qubit
+        sx = [0]*self.n_qubit
+        sy = [0]*self.n_qubit
+        for i in range(self.n_qubit):
+            population[i] = tensor(
+                [qeye(2)]*i + [sigmap()*sigmam()]+[qeye(2)]*(self.n_qubit-1-i))
+            sz[i] = tensor(
+                [qeye(2)]*i + [sigmaz()]+[qeye(2)]*(self.n_qubit-1-i))
+            sx[i] = tensor(
+                [qeye(2)]*i + [sigmax()]+[qeye(2)]*(self.n_qubit-1-i))
+            sy[i] = tensor(
+                [qeye(2)]*i + [sigmax()]+[qeye(2)]*(self.n_qubit-1-i))
+        return population, sz, sx, sy
+
 
 
 number_of_qubit = 2
-g = 100
+g = 5
 sim = QubitSimulator(number_of_qubit, g)
 H = sim.couple()+sim.multi_qubit_hamiltonian()
 c_ops = sim.multipleQ_cops()    
@@ -76,13 +88,12 @@ t = np.linspace(0,10*time_period, 101)
 base = [basis(2,0)]+[basis(2,1)]*(number_of_qubit-1)
 psi0 = tensor(base)
 psi=sim.initial_state(0)
-
+pop, sz, sx, sy = sim.measure_state()
 result = mesolve(H, psi, t, c_ops,[])
-
-
+print(sy)
 population = sigmap()*sigmam()
-a = expect(tensor([population]+[qeye(2)]*(number_of_qubit-1)), result.states)
-
+# a = expect(tensor([population]+[qeye(2)]*(number_of_qubit-1)), result.states)
+a = expect(sz[0], result.states)
 # b = expect(tensor([qeye(2)]+[population]+[qeye(2)]*3), result.states)
 # c = expect(tensor([qeye(2)]*2+[population]+[qeye(2)]*2), result.states)
 # d = expect(tensor([qeye(2)]*3+[population]+[qeye(2)]), result.states
@@ -92,6 +103,6 @@ plt.plot(a, label = "q1")
 # plt.plot(c, label = "q3")
 # plt.plot(d, label = "q4")
 # plt.plot(e, label = "q5")
-plt.xlabel("ns")
-plt.legend()
+# plt.xlabel("ns")
+# plt.legend()
 plt.show()
