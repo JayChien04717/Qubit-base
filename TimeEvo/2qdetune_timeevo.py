@@ -1,9 +1,8 @@
 import numpy as np
 from numpy import sqrt
-import qutip as qt 
 import matplotlib.pyplot as plt
-from qubit import *
-from op_funtion import *
+from qutip import *
+
 
 import time as T
 
@@ -29,8 +28,8 @@ c_ops.append(sqrt(g2) * sz2)
 
 
 
-tmon1 = TunableTransmon2(13, 0.229, 0, 2, 0).hamiltonium2()
-tmon2 = TunableTransmon2(12, 0.25, 0, 2, 0).hamiltonium2()
+# tmon1 = TunableTransmon2(13, 0.229, 0, 2, 0).hamiltonium2()
+# tmon2 = TunableTransmon2(12, 0.25, 0, 2, 0).hamiltonium2()
 
 h1 = 0.5*tensor(sigmaz(), qeye(2))
 h2 = 0.5*tensor(qeye(2), sigmaz())

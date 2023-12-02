@@ -68,10 +68,10 @@ class QubitSimulator:
             )
         return sum(hamiltonian_list)
     
-    def initial_state(self, n_qubit_excited):
+    def initial_state(self, n_qubit_excited:list):
         psi0=[]
         for i in range(self.n_qubit):
-            if i==n_qubit_excited:
+            if i in n_qubit_excited:
                 psi0 += [basis(2,0)]
             else:
                 psi0 += [basis(2,1)]
@@ -104,16 +104,17 @@ class QubitSimulator:
 
 
 if __name__=='__main__':
-    number_of_qubit = 2
-    g = 1
+    number_of_qubit = 14
+    g = 0.2
     sim = QubitSimulator(number_of_qubit, g)
     H = sim.couple()+sim.multi_qubit_hamiltonian()
     c_ops = sim.multipleQ_cops()
 
     time_period = 1/g
-    t = np.linspace(0,100*time_period, 1001)
-    psi=sim.initial_state(0)
+    t = np.linspace(0,10*time_period, 1001)
+    psi=sim.initial_state([1,3]) 
     pop, sz, sx, sy = sim.measure_state()
-    result = mesolve(H, psi, t, c_ops,[])
-    sim.plot(result, [0,1], t)
+    # result = mesolve(H, psi, t, c_ops,[])
+    result = krylovsolve(H, psi, t, krylov_dim=20, e_ops=c_ops)
+    sim.plot(result, [0,1,2,3,4], t)
 

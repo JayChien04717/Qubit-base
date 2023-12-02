@@ -5,7 +5,7 @@ from qutip import *
 
 
 #in MHz
-g = 1 * 2 * pi # coupling strength
+g = 10  # coupling strength
 g1 = 1.15    # relaxation rate
 g2 = 0.024       # dephasing rate
 n_th = 10e-3       # bath temperature
@@ -34,14 +34,18 @@ h2 = 0.5*tensor(qeye(2), sigmaz())
 couple = g*(tensor(sigmap(), sigmam())+tensor(sigmam(), sigmap()))
 H = h1+h2+couple
 
-t = np.linspace(0,5, 101)
+t_period = 1/g
+t = np.linspace(0,20*t_period, 101)
 psi0 = tensor(basis(2,1), basis(2,0))
 result = mesolve(couple, psi0, t, c_ops,[])
 
 population = sigmap()*sigmam() 
 a = expect(tensor(population, qeye(2)), result.states)
 b = expect(tensor(qeye(2), population), result.states)
-# plt.plot(a)
-plt.plot(b)
+plt.plot(a, label="qa")
+plt.plot(b, label="qb")
+plt.xlabel('us')
+plt.ylabel('population')
+plt.legend()
 plt.show()
 

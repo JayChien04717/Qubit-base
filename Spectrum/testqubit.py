@@ -51,22 +51,25 @@ def test_Fluxonium():
     ax[0].plot(z[:,2]-z2[:,1])
     ax[1].plot(z2[:,1]-z2[:,0])
     ax[1].plot(z2[:,2]-z2[:,1])
-    
-test_Fluxonium()
-plt.show()
+# Test part   
+# test_Fluxonium()
+# plt.show()
 
 # Compare with scqubits
 import scqubits as scq
 fluxonium = scq.Fluxonium(
-    EJ = 10,
+    EJ = 4,
     EC = 1,
     EL = 1,
     flux = 0.5,
     cutoff = 110
     )
-fluxlist = np.linspace(-0.5,0.5,101)
-energy = fluxonium.get_spectrum_vs_paramvals("flux",fluxlist , 3, False).energy_table
+fluxlist = np.linspace(0,1,101)
+energy = fluxonium.get_spectrum_vs_paramvals("flux",fluxlist , 10, False).energy_table
+fluxonium.plot_wavefunction(which=[0,1,2,3,4])
 
-plt.plot(fluxlist, energy[:,1]-energy[:,0])
-plt.plot(fluxlist, energy[:,2]-energy[:,1])
-plt.show()
+# for i in range(5):
+    # plt.plot(fluxlist, energy[:,i]-energy[:,0])
+# plt.plot(fluxlist, energy[:,1]-energy[:,0])
+# plt.plot(fluxlist, energy[:,2]-energy[:,1])
+# plt.show()
